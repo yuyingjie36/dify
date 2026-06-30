@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI影视助手</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #0d0d14;
+            --bg2: #161620;
+            --bg3: #1e1e28;
+            --ink: #e8e8f0;
+            --muted: #7a7a8c;
+            --accent: #d4a574;
+            --accent2: #f0b866;
+            --rule: #2a2a36;
+            --success: #5ae89a;
+        }
+
+        html {
+            height: 100%;
+        }
+
+        body {
+            font-family: 'Noto Sans SC', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--ink);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(180deg, var(--bg2) 0%, var(--bg) 100%);
+            border-bottom: 1px solid var(--rule);
+            padding: 1.25rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            animation: headerFadeIn 0.6s ease-out;
+        }
+
+        @keyframes headerFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .brand-icon {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            animation: iconPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes iconPulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .brand-text {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .brand-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--accent2);
+            letter-spacing: 0.02em;
+        }
+
+        .brand-subtitle {
+            font-size: 0.75rem;
+            color: var(--muted);
+            font-weight: 300;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--bg3);
+            border-radius: 20px;
+            border: 1px solid var(--rule);
+            font-size: 0.8rem;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+            animation: dotPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes dotPulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.6;
+            }
+        }
+
+        /* Main Container */
+        .main-container {
+            flex: 1;
+            position: relative;
+            background: linear-gradient(135deg, var(--bg) 0%, var(--bg2) 100%);
+            animation: containerFadeIn 0.8s ease-out 0.2s both;
+        }
+
+        @keyframes containerFadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* iframe Wrapper */
+        .iframe-wrapper {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            overflow: hidden;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+            background: var(--bg);
+            animation: iframeSlideIn 0.6s ease-out 0.4s both;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        @keyframes iframeSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            z-index: 10;
+            transition: opacity 0.4s ease-out, visibility 0.4s ease-out;
+        }
+
+        .loading-overlay.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .loading-spinner {
+            width: 48px;
+            height: 48px;
+            border: 3px solid var(--rule);
+            border-top-color: var(--accent2);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-text {
+            font-size: 0.9rem;
+            color: var(--muted);
+            font-weight: 300;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header {
+                padding: 1rem;
+            }
+
+            .brand-subtitle {
+                display: none;
+            }
+
+            .status-indicator {
+                font-size: 0.75rem;
+                padding: 0.4rem 0.75rem;
+            }
+
+            .iframe-wrapper {
+                min-height: calc(100vh - 60px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <div class="brand-icon">🎬</div>
+            <div class="brand-text">
+                <span class="brand-title">AI影视助手</span>
+                <span class="brand-subtitle">智能观影指南 · 专业影评生成</span>
+            </div>
+        </div>
+        <div class="status-indicator">
+            <div class="status-dot"></div>
+            <span>在线</span>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="main-container">
+        <div class="iframe-wrapper">
+            <!-- Loading Overlay -->
+            <div class="loading-overlay" id="loadingOverlay">
+                <div class="loading-spinner"></div>
+                <div class="loading-text">正在连接 AI 影视助手...</div>
+            </div>
+
+            <!-- iframe Embed -->
+            <iframe 
+                src="https://trippant-vernon-unexecuted.ngrok-free.dev/chatbot/z4sQuELWaemWQvXi"
+                allow="microphone"
+                onload="handleIframeLoad()"
+                id="chatbotIframe">
+            </iframe>
+        </div>
+    </main>
+
+    <script>
+        // iframe加载完成后隐藏loading
+        function handleIframeLoad() {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            if (loadingOverlay) {
+                setTimeout(() => {
+                    loadingOverlay.classList.add('hidden');
+                }, 300);
+            }
+        }
+
+        // 监听iframe加载超时（15秒）
+        setTimeout(() => {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            if (loadingOverlay && !loadingOverlay.classList.contains('hidden')) {
+                loadingOverlay.querySelector('.loading-text').textContent = '连接超时，请刷新页面重试';
+            }
+        }, 15000);
+    </script>
+</body>
+</html>
